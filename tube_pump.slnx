@@ -5,7 +5,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="tube_pump/tube_pump.vcxproj">
+  <Project Path="tube_pump/tube_pump.vcxproj" Id="7781887b-ca8c-4b33-bbdb-3a440a40bd03">
     <Platform Solution="*|x86" Project="x86" />
     <Deploy />
   </Project>
