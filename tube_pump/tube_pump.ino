@@ -30,6 +30,11 @@ constexpr size_t MAX_QUEUE_MESSAGES = 16;
 #define TTL_RX2 10
 #define TTL_RX3 6
 
+// TTL 接收引脚 (RX)
+#define OUTPUT1 7
+#define OUTPUT2 5
+#define OUTPUT3 4
+
 // 简单处理函数：打印摘要、做个示例校验（异或）并把消息入队
 void handleReceivedMessage(const std::vector<uint8_t>& msg) {
 	if (msg.empty()) return;
@@ -85,8 +90,10 @@ void setup() {
 	pinMode(LED_BUILTIN2, OUTPUT);
 	digitalWrite(LED_BUILTIN1, LOW);
 	digitalWrite(LED_BUILTIN2, LOW);
-	pinMode(7, OUTPUT);
-	analogWrite(7, 256);
+	pinMode(OUTPUT1, OUTPUT);
+	pinMode(OUTPUT2, OUTPUT);
+	pinMode(OUTPUT3, OUTPUT);
+	analogWrite(7, 20);
 }
 
 // the loop function runs over and over again until power down or reset
