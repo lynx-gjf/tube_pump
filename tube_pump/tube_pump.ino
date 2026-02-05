@@ -1,3 +1,4 @@
+#include <dummy.h>
 #include "ttl_comm.h"
 #include "ttl_send.h"
 #include "hex_reader.h"
@@ -102,27 +103,42 @@ void loop() {
 	digitalWrite(LED_BUILTIN1, LOW);
 	digitalWrite(LED_BUILTIN2, HIGH);
 
-	uint8_t test[] = { 1,2,3,4,5,6,7,8 };
-	vector<uint8_t> testVec1 = { 0x55,0x06,0x00,0x05,0x00,0x01,0x55,0xdf };
-	vector<uint8_t> testVec2 = { 0x55,0x06,0x00,0x07,0x00,0x01,0xf4,0x1f };
 	// 发送到调试串口（示例）
-
 	// 修正：将 vector<uint8_t> 转为指针和长度，并补齐参数
 	// send_bytes_channel(TTL_TX1, TTL_RX1, testVec1.data(), testVec1.size());
 	// sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,1<CR><LF>");
+	
 	// 从调试串口读取并获取字节数组（已经打印过一次）
 	vector<uint8_t> dbg = pollAndPrintHex(2000);
+	send_bytes_serial(dbg.data(), dbg.size());
 	if (!dbg.empty()) {
 		updateThroughput(dbg.size());
 		handleReceivedMessage(dbg);
 	}
-
+	if (dbg[2] == 1)
+		{
+		analogWrite(OUTPUT1, dbg[3]);
+	}
+	else if (dbg[2] == 2)
+	{
+		analogWrite(OUTPUT2, dbg[3]);
+	}
+	else if (dbg[2] == 3)
+	{
+		analogWrite(OUTPUT3, dbg[3]);
+	}
+	else
+	{
+		analogWrite(OUTPUT1, 0);
+		analogWrite(OUTPUT2, 0);
+		analogWrite(OUTPUT3, 0);
+	}
 	// 从三个 TTL 通道读取（统一接口），处理返回值
-	vector<uint8_t> b1 = pollAndPrintHexFromChannel(TTL_RX1, TTL_TX1, 100);
-	if (!b1.empty()) {
+	 //vector<uint8_t> b1 = pollAndPrintHexFromChannel(TTL_RX1, TTL_TX1, 100);
+	/* if (!b1.empty()) {
 		updateThroughput(b1.size());
 		handleReceivedMessage(b1);
-	}
+	} 
 
 	vector<uint8_t> b2 = pollAndPrintHexFromChannel(TTL_RX2, TTL_TX2, 100);
 	if (!b2.empty()) {
@@ -135,22 +151,23 @@ void loop() {
 		updateThroughput(b3.size());
 		handleReceivedMessage(b3);
 	}
+	*/
 
 	// 可选：从队列中消费消息（示例）
-	if (!messageQueue.empty()) {
+	/* if (!messageQueue.empty()) {
 		// 处理并移除队头
 		auto msg = messageQueue.front();
 		messageQueue.erase(messageQueue.begin());
 		// 做进一步解析/分发（示例只是打印长度）
 		Serial.print("Consuming queued msg len=");
 		Serial.println(msg.size());
-	}
+	} */
 
 	delay(10000);// 控制主循环频率
 
 	digitalWrite(LED_BUILTIN1, HIGH);
 	digitalWrite(LED_BUILTIN2, LOW);
-
+	// 发送到调试串口（示例）
 	//send_bytes_channel(TTL_TX1, TTL_RX1, testVec2.data(), testVec2.size()); // 发送到指定通道
 	//sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,0<CR><LF>"); // 发送到指定通道
 	delay(10000);
