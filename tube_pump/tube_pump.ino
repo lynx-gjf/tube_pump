@@ -108,8 +108,8 @@ void loop() {
 	// 发送到调试串口（示例）
 
 	// 修正：将 vector<uint8_t> 转为指针和长度，并补齐参数
-	send_bytes_channel(TTL_TX1, TTL_RX1, testVec1.data(), testVec1.size());
-	sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,1<CR><LF>");
+	// send_bytes_channel(TTL_TX1, TTL_RX1, testVec1.data(), testVec1.size());
+	// sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,1<CR><LF>");
 	// 从调试串口读取并获取字节数组（已经打印过一次）
 	vector<uint8_t> dbg = pollAndPrintHex(2000);
 	if (!dbg.empty()) {
@@ -151,7 +151,7 @@ void loop() {
 	digitalWrite(LED_BUILTIN1, HIGH);
 	digitalWrite(LED_BUILTIN2, LOW);
 
-	send_bytes_channel(TTL_TX1, TTL_RX1, testVec2.data(), testVec2.size());
-	sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,0<CR><LF>");
+	//send_bytes_channel(TTL_TX1, TTL_RX1, testVec2.data(), testVec2.size()); // 发送到指定通道
+	//sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,0<CR><LF>"); // 发送到指定通道
 	delay(10000);
 }
