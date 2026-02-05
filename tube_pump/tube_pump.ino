@@ -100,6 +100,7 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop() {
 	// LED ÇÐ»»
+	delay(2000);
 	digitalWrite(LED_BUILTIN1, LOW);
 	digitalWrite(LED_BUILTIN2, HIGH);
 
