@@ -1,7 +1,6 @@
 #include <dummy.h>
 #include "ttl_comm.h"
 #include "ttl_send.h"
-#include "hex_reader.h"
 
 using namespace std;
 
@@ -36,50 +35,6 @@ constexpr size_t MAX_QUEUE_MESSAGES = 16;
 #define OUTPUT2 5
 #define OUTPUT3 4
 
-// 简单处理函数：打印摘要、做个示例校验（异或）并把消息入队
-void handleReceivedMessage(const std::vector<uint8_t>& msg) {
-	if (msg.empty()) return;
-
-	// 打印摘要
-	Serial.print("handleReceivedMessage: len=");
-	Serial.print(msg.size());
-	Serial.print(" first=");
-	if (msg.size()) {
-		if (msg[0] < 16) Serial.print('0');
-		Serial.print(msg[0], HEX);
-	}
-	Serial.println();
-
-	// 示例：计算简单 XOR 校验（不改变 msg）
-	uint8_t xorSum = 0;
-	for (size_t i = 0; i < msg.size(); ++i) xorSum ^= msg[i];
-	Serial.print(" XOR checksum=");
-	if (xorSum < 16) Serial.print('0');
-	Serial.println(xorSum, HEX);
-
-	// 入队（若队列满，丢弃最早一项）
-	if (messageQueue.size() >= MAX_QUEUE_MESSAGES) messageQueue.erase(messageQueue.begin());
-	messageQueue.push_back(msg);
-}
-
-// 更新吞吐量统计并周期性打印（每秒）
-void updateThroughput(size_t newBytes) {
-	unsigned long now = millis();
-	if (throughputWindowStart == 0) throughputWindowStart = now;
-	throughputBytes += newBytes;
-	if (now - throughputWindowStart >= 1000) {
-		float kbps = (throughputBytes / 1024.0f) / ((now - throughputWindowStart) / 1000.0f);
-		Serial.print("Throughput: ");
-		Serial.print(throughputBytes);
-		Serial.print(" bytes / ");
-		Serial.print((now - throughputWindowStart));
-		Serial.print(" ms (");
-		Serial.print(kbps, 2);
-		Serial.println(" KB/s)");
-		throughputBytes = 0;
-		throughputWindowStart = now;
-	}
-}
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -101,7 +56,7 @@ void setup() {
 void loop() {
 	// LED 切换
 	digitalWrite(LED_BUILTIN1, LOW);
-	digitalWrite(LED_BUILTIN2, HIGH);
+	digitalWrite(LED_BUILTIN2, LOW);
 
 	// 发送到调试串口（示例）
 	// 修正：将 vector<uint8_t> 转为指针和长度，并补齐参数
@@ -109,14 +64,16 @@ void loop() {
 	// sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,1<CR><LF>");
 	
 	// 从调试串口读取并获取字节数组（已经打印过一次）
-	char dbgBuf[512]; // 预留足够空间
-	int dbgLen = read_string_serial(dbgBuf, sizeof(dbgBuf) - 1); // 传入缓冲区和最大长度
-	String dbg = String(dbgBuf); // 转换为 String 类型
-	send_bytes_serial(dbg);
-	if (!dbg.empty()) {
-		updateThroughput(dbg.size());
-		handleReceivedMessage(dbg);
-	}
+	String dbg = "";
+	do
+	{
+		char dbgBuf[512]; // 预留足够空间
+		int dbgLen = read_string_serial(dbgBuf, sizeof(dbgBuf) - 1, 500); // 传入缓冲区和最大长度
+		String dbg = String(dbgBuf); // 转换为 String 类型
+	} while (dbg = "");
+	digitalWrite(LED_BUILTIN1, HIGH);
+	digitalWrite(LED_BUILTIN2, LOW);
+	Serial.print(dbg);
 	if (dbg[2] == 1)
 	{
 		analogWrite(OUTPUT1, dbg[3]);
@@ -165,10 +122,7 @@ void loop() {
 		Serial.println(msg.size());
 	} */
 
-	delay(10000);// 控制主循环频率
-
-	digitalWrite(LED_BUILTIN1, HIGH);
-	digitalWrite(LED_BUILTIN2, LOW);
+	delay(100); // 避免过快循环
 	// 发送到调试串口（示例）
 	//send_bytes_channel(TTL_TX1, TTL_RX1, testVec2.data(), testVec2.size()); // 发送到指定通道
 	//sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,0<CR><LF>"); // 发送到指定通道

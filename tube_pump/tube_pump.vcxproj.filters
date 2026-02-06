@@ -21,12 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tube_pump.ino" />
-    <ClCompile Include="..\..\esp32c3\esp32c3\hex_parser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\esp32c3\esp32c3\hex_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\esp32c3\esp32c3\ttl_comm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,12 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.tube_pump.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\esp32c3\esp32c3\hex_parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\esp32c3\esp32c3\hex_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\esp32c3\esp32c3\ttl_comm.h">
