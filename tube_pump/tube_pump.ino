@@ -36,7 +36,7 @@ static size_t messageQueueCount = 0;
 #define TTL_RX3 6
 
 // OUTPUT 引脚
-#define OUTPUT1 7
+#define OUTPUT1 6
 #define OUTPUT2 5
 #define OUTPUT3 4
 
@@ -67,7 +67,6 @@ void loop() {
 	analogWrite(OUTPUT1, 1);
 	analogWrite(OUTPUT1, 1);
 	// LED 切换
-	digitalWrite(LED_BUILTIN1, LOW);
 	digitalWrite(LED_BUILTIN2, LOW);
 
 	// 从调试串口读取并获取字节数组（已经打印过一次）
@@ -79,9 +78,8 @@ void loop() {
 		int dbgLen = read_string_serial(dbgBuf, sizeof(dbgBuf) - 1, 500); // 传入缓冲区和最大长度
 		dbg = String(dbgBuf); // 转换为 String 类型
 	} 
-	digitalWrite(LED_BUILTIN1, HIGH);
-	digitalWrite(LED_BUILTIN2, LOW);
-	Serial.print(dbg);
+	digitalWrite(LED_BUILTIN2, HIGH);
+	Serial.print(dbg + "\n");
 	delay(100);
 
 	// 使用固定大小 C 数组接收解析结果
@@ -108,7 +106,15 @@ void loop() {
 			analogWrite(OUTPUT3, parsed[2]);
 		}
 	}
-	dbg = "";
+	digitalWrite(LED_BUILTIN2, LOW);
+	analogWrite(OUTPUT1, 20);
+	delay(10000);
+	digitalWrite(LED_BUILTIN2, HIGH);
+	analogWrite(OUTPUT1, 50);
+	delay(10000);
+	digitalWrite(LED_BUILTIN2, LOW);
+	analogWrite(OUTPUT1, 80);
+	delay(10000);
+	digitalWrite(LED_BUILTIN2, HIGH);
 	// 其余 TTL 读取逻辑和队列操作（如需我可以把 vector 风格的代码也改为循环队列实现）
-	delay(100); // 避免过快循环
 }
