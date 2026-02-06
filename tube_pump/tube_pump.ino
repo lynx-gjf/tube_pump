@@ -100,7 +100,6 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop() {
 	// LED 切换
-	delay(2000);
 	digitalWrite(LED_BUILTIN1, LOW);
 	digitalWrite(LED_BUILTIN2, HIGH);
 
@@ -110,14 +109,16 @@ void loop() {
 	// sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,1<CR><LF>");
 	
 	// 从调试串口读取并获取字节数组（已经打印过一次）
-	vector<uint8_t> dbg = pollAndPrintHex(2000);
-	send_bytes_serial(dbg.data(), dbg.size());
+	char dbgBuf[512]; // 预留足够空间
+	int dbgLen = read_string_serial(dbgBuf, sizeof(dbgBuf) - 1); // 传入缓冲区和最大长度
+	String dbg = String(dbgBuf); // 转换为 String 类型
+	send_bytes_serial(dbg);
 	if (!dbg.empty()) {
 		updateThroughput(dbg.size());
 		handleReceivedMessage(dbg);
 	}
 	if (dbg[2] == 1)
-		{
+	{
 		analogWrite(OUTPUT1, dbg[3]);
 	}
 	else if (dbg[2] == 2)
@@ -171,5 +172,4 @@ void loop() {
 	// 发送到调试串口（示例）
 	//send_bytes_channel(TTL_TX1, TTL_RX1, testVec2.data(), testVec2.size()); // 发送到指定通道
 	//sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,0<CR><LF>"); // 发送到指定通道
-	delay(10000);
 }
