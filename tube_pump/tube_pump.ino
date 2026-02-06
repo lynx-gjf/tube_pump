@@ -6,10 +6,15 @@ using namespace std;
 
 static unsigned long throughputWindowStart = 0;
 static size_t throughputBytes = 0;
-// 简单消息队列：存放最近接收到的消息
-static vector<vector<uint8_t>> messageQueue;
-// 限制队列大小，避免内存无限增长
+
+// 使用固定大小队列替代 vector（避免 STL）
+// 每条消息最大长度（调整为合适值）
 constexpr size_t MAX_QUEUE_MESSAGES = 16;
+constexpr size_t MAX_MESSAGE_LEN = 128;
+static uint8_t messageQueue[MAX_QUEUE_MESSAGES][MAX_MESSAGE_LEN];
+static size_t messageQueueLen[MAX_QUEUE_MESSAGES];
+static size_t messageQueueHead = 0;
+static size_t messageQueueCount = 0;
 
 /*
  Name:		pumps.ino
@@ -65,11 +70,6 @@ void loop() {
 	digitalWrite(LED_BUILTIN1, LOW);
 	digitalWrite(LED_BUILTIN2, LOW);
 
-	// 发送到调试串口（示例）
-	// 修正：将 vector<uint8_t> 转为指针和长度，并补齐参数
-	// send_bytes_channel(TTL_TX1, TTL_RX1, testVec1.data(), testVec1.size());
-	// sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,1<CR><LF>");
-	
 	// 从调试串口读取并获取字节数组（已经打印过一次）
 	String dbg = "";
 	String zero = "";
@@ -83,57 +83,32 @@ void loop() {
 	digitalWrite(LED_BUILTIN2, LOW);
 	Serial.print(dbg);
 	delay(100);
-	auto v = parseCommandString(dbg);
 
-	for (int x : v) {
-		Serial.println(x);
+	// 使用固定大小 C 数组接收解析结果
+	int parsed[8];
+	size_t parsedCount = parseCommandString(dbg, parsed, sizeof(parsed) / sizeof(parsed[0]));
+
+	for (size_t i = 0; i < parsedCount; ++i) {
+		Serial.println(parsed[i]);
 	}
 
-	if (v[1] == 1)
+	// 安全检查后根据协议执行
+	if (parsedCount > 2)
 	{
-		analogWrite(OUTPUT1, v[2]);
-	}
-	else if (v[1] == 2)
-	{
-		analogWrite(OUTPUT2, v[2]);
-	}
-	else if (v[1] == 3)
-	{
-		analogWrite(OUTPUT3, v[2]);
+		if (parsed[1] == 1)
+		{
+			analogWrite(OUTPUT1, parsed[2]);
+		}
+		else if (parsed[1] == 2)
+		{
+			analogWrite(OUTPUT2, parsed[2]);
+		}
+		else if (parsed[1] == 3)
+		{
+			analogWrite(OUTPUT3, parsed[2]);
+		}
 	}
 	dbg = "";
-	// 从三个 TTL 通道读取（统一接口），处理返回值
-	 //vector<uint8_t> b1 = pollAndPrintHexFromChannel(TTL_RX1, TTL_TX1, 100);
-	/* if (!b1.empty()) {
-		updateThroughput(b1.size());
-		handleReceivedMessage(b1);
-	} 
-
-	vector<uint8_t> b2 = pollAndPrintHexFromChannel(TTL_RX2, TTL_TX2, 100);
-	if (!b2.empty()) {
-		updateThroughput(b2.size());
-		handleReceivedMessage(b2);
-	}
-
-	vector<uint8_t> b3 = pollAndPrintHexFromChannel(TTL_RX3, TTL_TX3, 100);
-	if (!b3.empty()) {
-		updateThroughput(b3.size());
-		handleReceivedMessage(b3);
-	}
-	*/
-
-	// 可选：从队列中消费消息（示例）
-	/* if (!messageQueue.empty()) {
-		// 处理并移除队头
-		auto msg = messageQueue.front();
-		messageQueue.erase(messageQueue.begin());
-		// 做进一步解析/分发（示例只是打印长度）
-		Serial.print("Consuming queued msg len=");
-		Serial.println(msg.size());
-	} */
-
+	// 其余 TTL 读取逻辑和队列操作（如需我可以把 vector 风格的代码也改为循环队列实现）
 	delay(100); // 避免过快循环
-	// 发送到调试串口（示例）
-	//send_bytes_channel(TTL_TX1, TTL_RX1, testVec2.data(), testVec2.size()); // 发送到指定通道
-	//sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,0<CR><LF>"); // 发送到指定通道
 }
