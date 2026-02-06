@@ -40,6 +40,10 @@ static size_t messageQueueCount = 0;
 #define OUTPUT2 5
 #define OUTPUT3 4
 
+// 模拟输入引脚
+int analogInPin = A1;
+int sensorValue = 0; // 存储模拟输入的值
+float voltage = 0;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -77,10 +81,16 @@ void loop() {
 		char dbgBuf[512]; // 预留足够空间
 		int dbgLen = read_string_serial(dbgBuf, sizeof(dbgBuf) - 1, 500); // 传入缓冲区和最大长度
 		dbg = String(dbgBuf); // 转换为 String 类型
+		sensorValue = analogRead(analogInPin); // 读取模拟输入的值
+		voltage = sensorValue * (5.0 / 1023.0); // 将模拟输入的值转换为电压值
+		Serial.print("voltage: ");
+		Serial.println(voltage);
+		delay(1000);
 	} 
 	digitalWrite(LED_BUILTIN2, HIGH);
 	Serial.print(dbg + "\n");
 	delay(100);
+
 
 	// 使用固定大小 C 数组接收解析结果
 	int parsed[8];
