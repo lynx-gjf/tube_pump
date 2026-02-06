@@ -1,6 +1,7 @@
 #include <dummy.h>
 #include "ttl_comm.h"
 #include "ttl_send.h"
+#include "cmd_parser.h"
 
 using namespace std;
 
@@ -74,6 +75,13 @@ void loop() {
 	digitalWrite(LED_BUILTIN1, HIGH);
 	digitalWrite(LED_BUILTIN2, LOW);
 	Serial.print(dbg);
+
+	auto v = parseCommandString(dbg);
+
+	for (int x : v) {
+		Serial.println(x);
+	}
+
 	if (dbg[2] == 1)
 	{
 		analogWrite(OUTPUT1, dbg[3]);
@@ -85,12 +93,6 @@ void loop() {
 	else if (dbg[2] == 3)
 	{
 		analogWrite(OUTPUT3, dbg[3]);
-	}
-	else
-	{
-		analogWrite(OUTPUT1, 0);
-		analogWrite(OUTPUT2, 0);
-		analogWrite(OUTPUT3, 0);
 	}
 	// 从三个 TTL 通道读取（统一接口），处理返回值
 	 //vector<uint8_t> b1 = pollAndPrintHexFromChannel(TTL_RX1, TTL_TX1, 100);
