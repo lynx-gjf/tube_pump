@@ -94,7 +94,7 @@ void setup() {
 	pinMode(OUTPUT1, OUTPUT);
 	pinMode(OUTPUT2, OUTPUT);
 	pinMode(OUTPUT3, OUTPUT);
-	analogWrite(7, 20);
+	analogWrite(OUTPUT1, 20);
 }
 
 // the loop function runs over and over again until power down or reset
