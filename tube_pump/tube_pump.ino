@@ -1,4 +1,3 @@
-#include <dummy.h>
 #include "ttl_comm.h"
 #include "ttl_send.h"
 #include "cmd_parser.h"
