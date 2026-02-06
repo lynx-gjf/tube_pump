@@ -55,6 +55,13 @@ void setup() {
 
 // the loop function runs over and over again until power down or reset
 void loop() {
+	analogWrite(OUTPUT1, 128);
+	analogWrite(OUTPUT1, 128);
+	analogWrite(OUTPUT1, 128);
+	delay(2000);
+	analogWrite(OUTPUT1, 1);
+	analogWrite(OUTPUT1, 1);
+	analogWrite(OUTPUT1, 1);
 	// LED 切换
 	digitalWrite(LED_BUILTIN1, LOW);
 	digitalWrite(LED_BUILTIN2, LOW);
@@ -65,8 +72,8 @@ void loop() {
 	// sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,1<CR><LF>");
 	
 	// 从调试串口读取并获取字节数组（已经打印过一次）
-	String dbg = "start";
-	String zero = "start";
+	String dbg = "";
+	String zero = "";
 	while (dbg.compareTo(zero) == 0)
 	{
 		char dbgBuf[512]; // 预留足够空间
@@ -76,26 +83,26 @@ void loop() {
 	digitalWrite(LED_BUILTIN1, HIGH);
 	digitalWrite(LED_BUILTIN2, LOW);
 	Serial.print(dbg);
-	delay(1000);
+	delay(100);
 	auto v = parseCommandString(dbg);
 
 	for (int x : v) {
 		Serial.println(x);
 	}
 
-	if (dbg[2] == 1)
+	if (v[1] == 1)
 	{
-		analogWrite(OUTPUT1, dbg[3]);
+		analogWrite(OUTPUT1, v[2]);
 	}
-	else if (dbg[2] == 2)
+	else if (v[1] == 2)
 	{
-		analogWrite(OUTPUT2, dbg[3]);
+		analogWrite(OUTPUT2, v[2]);
 	}
-	else if (dbg[2] == 3)
+	else if (v[1] == 3)
 	{
-		analogWrite(OUTPUT3, dbg[3]);
+		analogWrite(OUTPUT3, v[2]);
 	}
-	dbg = "start";
+	dbg = "";
 	// 从三个 TTL 通道读取（统一接口），处理返回值
 	 //vector<uint8_t> b1 = pollAndPrintHexFromChannel(TTL_RX1, TTL_TX1, 100);
 	/* if (!b1.empty()) {
