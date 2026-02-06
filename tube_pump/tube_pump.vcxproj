@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\esp32c3\esp32c3\ttl_comm.cpp" />
     <ClCompile Include="..\..\esp32c3\esp32c3\ttl_send.cpp" />
+    <ClCompile Include="cmd_parser.cpp" />
     <ClCompile Include="tube_pump.ino">
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
@@ -97,6 +98,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\esp32c3\esp32c3\ttl_comm.h" />
     <ClInclude Include="..\..\esp32c3\esp32c3\ttl_send.h" />
+    <ClInclude Include="cmd_parser.h" />
     <ClInclude Include="__vm\.tube_pump.vsarduino.h" />
   </ItemGroup>
   <PropertyGroup>

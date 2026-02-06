@@ -1,6 +1,7 @@
 #include <dummy.h>
 #include "ttl_comm.h"
 #include "ttl_send.h"
+#include "cmd_parser.h"
 
 using namespace std;
 
@@ -64,16 +65,24 @@ void loop() {
 	// sendToChannel(TTL_TX1, TTL_RX1, "P0,G1,1<CR><LF>");
 	
 	// 从调试串口读取并获取字节数组（已经打印过一次）
-	String dbg = "";
-	do
+	String dbg = "start";
+	String zero = "start";
+	while (dbg.compareTo(zero) == 0)
 	{
 		char dbgBuf[512]; // 预留足够空间
 		int dbgLen = read_string_serial(dbgBuf, sizeof(dbgBuf) - 1, 500); // 传入缓冲区和最大长度
-		String dbg = String(dbgBuf); // 转换为 String 类型
-	} while (dbg = "");
+		dbg = String(dbgBuf); // 转换为 String 类型
+	} 
 	digitalWrite(LED_BUILTIN1, HIGH);
 	digitalWrite(LED_BUILTIN2, LOW);
 	Serial.print(dbg);
+	delay(1000);
+	auto v = parseCommandString(dbg);
+
+	for (int x : v) {
+		Serial.println(x);
+	}
+
 	if (dbg[2] == 1)
 	{
 		analogWrite(OUTPUT1, dbg[3]);
@@ -86,12 +95,7 @@ void loop() {
 	{
 		analogWrite(OUTPUT3, dbg[3]);
 	}
-	else
-	{
-		analogWrite(OUTPUT1, 0);
-		analogWrite(OUTPUT2, 0);
-		analogWrite(OUTPUT3, 0);
-	}
+	dbg = "start";
 	// 从三个 TTL 通道读取（统一接口），处理返回值
 	 //vector<uint8_t> b1 = pollAndPrintHexFromChannel(TTL_RX1, TTL_TX1, 100);
 	/* if (!b1.empty()) {
