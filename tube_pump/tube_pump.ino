@@ -84,7 +84,7 @@ void loop() {
 		sensorValue = analogRead(analogInPin); // 读取模拟输入的值
 		voltage = sensorValue * (5.0 / 1023.0); // 将模拟输入的值转换为电压值
 		Serial.print("voltage: ");
-		Serial.println(voltage);
+		Serial.println(voltage, 4);
 		delay(1000);
 	} 
 	digitalWrite(LED_BUILTIN2, HIGH);
