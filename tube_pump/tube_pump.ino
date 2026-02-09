@@ -25,24 +25,14 @@ static size_t messageQueueCount = 0;
 #define LED_BUILTIN 13
 
 // TTL 发送引脚 (TX)
-#define TTL_TX1 1
-#define TTL_TX2 18
-#define TTL_TX3 19
+#define TTL_TX1 2
+#define TTL_TX2 3
+#define TTL_TX3 4
 
 // TTL 接收引脚 (RX)
-#define TTL_RX1 2
-#define TTL_RX2 10
-#define TTL_RX3 6
-
-// OUTPUT 引脚
-#define OUTPUT1 6
-#define OUTPUT2 5
-#define OUTPUT3 4
-
-// 模拟输入引脚
-int analogInPin = A1;
-int sensorValue = 0; // 存储模拟输入的值
-float voltage = 0;
+#define TTL_RX1 8
+#define TTL_RX2 9
+#define TTL_RX3 10
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -50,70 +40,16 @@ void setup() {
 	// 初始化 Serial1 为默认通道 1（可以马上重配置也行）
 	configureTTL(TTL_RX1, TTL_TX1, TTL_BAUD);
 
-	pinMode(LED_BUILTIN1, OUTPUT);
-	pinMode(LED_BUILTIN2, OUTPUT);
-	digitalWrite(LED_BUILTIN1, LOW);
-	digitalWrite(LED_BUILTIN2, LOW);
-	pinMode(OUTPUT1, OUTPUT);
-	pinMode(OUTPUT2, OUTPUT);
-	pinMode(OUTPUT3, OUTPUT);
-	analogWrite(OUTPUT1, 20);
+	pinMode(LED_BUILTIN, OUTPUT);
+	digitalWrite(LED_BUILTIN, LOW);
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-	analogWrite(OUTPUT1, 128);
-	analogWrite(OUTPUT1, 128);
-	analogWrite(OUTPUT1, 128);
-	delay(2000);
-	analogWrite(OUTPUT1, 1);
-	analogWrite(OUTPUT1, 1);
-	analogWrite(OUTPUT1, 1);
 	// LED 切换
 	digitalWrite(LED_BUILTIN, LOW);
-
-	// 从调试串口读取并获取字节数组（已经打印过一次）
-	String dbg = "";
-	String zero = "";
-	while (dbg.compareTo(zero) == 0)
-	{
-		char dbgBuf[512]; // 预留足够空间
-		int dbgLen = read_string_serial(dbgBuf, sizeof(dbgBuf) - 1, 500); // 传入缓冲区和最大长度
-		dbg = String(dbgBuf); // 转换为 String 类型
-		sensorValue = analogRead(analogInPin); // 读取模拟输入的值
-		voltage = sensorValue * (5.0 / 1023.0); // 将模拟输入的值转换为电压值
-		Serial.print("voltage: ");
-		Serial.println(voltage, 4);
-		delay(1000);
-	} 
-	digitalWrite(LED_BUILTIN, HIGH);
-	Serial.print(dbg + "\n");
 	delay(100);
 
 
-	// 使用固定大小 C 数组接收解析结果
-	int parsed[8];
-	size_t parsedCount = parseCommandString(dbg, parsed, sizeof(parsed) / sizeof(parsed[0]));
 
-	for (size_t i = 0; i < parsedCount; ++i) {
-		Serial.println(parsed[i]);
-	}
-
-	// 安全检查后根据协议执行
-	if (parsedCount > 2)
-	{
-		if (parsed[1] == 1)
-		{
-			analogWrite(OUTPUT1, parsed[2]);
-		}
-		else if (parsed[1] == 2)
-		{
-			analogWrite(OUTPUT2, parsed[2]);
-		}
-		else if (parsed[1] == 3)
-		{
-			analogWrite(OUTPUT3, parsed[2]);
-		}
-	}
-	// 其余 TTL 读取逻辑和队列操作（如需我可以把 vector 风格的代码也改为循环队列实现）
 }
