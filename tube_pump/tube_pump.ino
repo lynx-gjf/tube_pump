@@ -49,6 +49,8 @@ void loop() {
 	String channel = String(buf_serial[1]);
 	int channnel = channel.toInt();
 	String pre_send = buf_serial.substring(3);
+	Serial.println(channnel);
+	Serial.println(pre_send);
 
 	// 将 Serial 输入转发到对应 TTL 通道（保持原调用顺序；注意 tx/rx 参数顺序）
 	send_string_channel(rxPins[channnel], txPins[channnel], pre_send); // 修正第二个参数为 TX1，且不赋值给 String
@@ -63,9 +65,11 @@ void loop() {
 		buf_ttl[st] = got_ttl;
 		// 让出一点时间给其他系统任务
 		yield();
+		Serial.print(st);
 		Serial.println(buf_ttl[st]);
+		delay(5);
 	}
 
-	// 短延时，避免占用过高 CPU（根据实时需求可调整或移除）
-	delay(5);
+	// 延时，避免占用过高 CPU（根据实时需求可调整或移除）
+	delay(1000);
 }
