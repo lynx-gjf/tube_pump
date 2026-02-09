@@ -101,6 +101,9 @@
     <ClInclude Include="cmd_parser.h" />
     <ClInclude Include="__vm\.tube_pump.vsarduino.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
+  </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
   </PropertyGroup>
