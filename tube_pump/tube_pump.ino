@@ -22,8 +22,7 @@ static size_t messageQueueCount = 0;
  Author:	gwq
 */
 
-#define LED_BUILTIN1 12
-#define LED_BUILTIN2 13
+#define LED_BUILTIN 13
 
 // TTL 发送引脚 (TX)
 #define TTL_TX1 1
@@ -71,7 +70,7 @@ void loop() {
 	analogWrite(OUTPUT1, 1);
 	analogWrite(OUTPUT1, 1);
 	// LED 切换
-	digitalWrite(LED_BUILTIN2, LOW);
+	digitalWrite(LED_BUILTIN, LOW);
 
 	// 从调试串口读取并获取字节数组（已经打印过一次）
 	String dbg = "";
@@ -87,7 +86,7 @@ void loop() {
 		Serial.println(voltage, 4);
 		delay(1000);
 	} 
-	digitalWrite(LED_BUILTIN2, HIGH);
+	digitalWrite(LED_BUILTIN, HIGH);
 	Serial.print(dbg + "\n");
 	delay(100);
 
@@ -116,15 +115,5 @@ void loop() {
 			analogWrite(OUTPUT3, parsed[2]);
 		}
 	}
-	digitalWrite(LED_BUILTIN2, LOW);
-	analogWrite(OUTPUT1, 20);
-	delay(10000);
-	digitalWrite(LED_BUILTIN2, HIGH);
-	analogWrite(OUTPUT1, 50);
-	delay(10000);
-	digitalWrite(LED_BUILTIN2, LOW);
-	analogWrite(OUTPUT1, 80);
-	delay(10000);
-	digitalWrite(LED_BUILTIN2, HIGH);
 	// 其余 TTL 读取逻辑和队列操作（如需我可以把 vector 风格的代码也改为循环队列实现）
 }
