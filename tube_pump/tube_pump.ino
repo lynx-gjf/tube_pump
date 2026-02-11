@@ -32,8 +32,6 @@ void setup() {
 }
 
 void loop() {
-	// 指示灯亮，表明主循环在运行
-	digitalWrite(LED_BUILTIN, HIGH);
 	delay(1000);
 	// 从 Serial 读取输入到 String
 	String buf_serial = read_string_serial(perChannelTimeoutMs);
@@ -57,14 +55,21 @@ void loop() {
 	String pre_send = buf_serial.substring(3);
 	pre_send.trim(); // 去除前后空白
 	pre_send = pre_send + "\r\n";
-
-	// 将 Serial 输入转发到对应 TTL 通道（注意 tx/rx 参数顺序）
-	send_string_channel(txPins[channel_num], rxPins[channel_num], pre_send);
-	delay(100); // 短暂延时，确保发送完成
-	String got_ttl = read_string_channel(rxPins[channel_num], txPins[channel_num], 200);
-	Serial.println(got_ttl);
-	// 三个通道按顺序轮询
-
+	if (pre_send.length() > 5) {
+		send_string_channel(txPins[channel_num], rxPins[channel_num], pre_send);
+		digitalWrite(LED_BUILTIN, HIGH);
+		delay(100); // 短暂延时，确保发送完成
+		digitalWrite(LED_BUILTIN, LOW);
+		String got_ttl = read_string_channel(rxPins[channel_num], txPins[channel_num], 200);
+		// 输出 TTL 响应到 Serial 监视器
+		if (got_ttl.length() > 0) {
+			Serial.println(got_ttl);
+			digitalWrite(LED_BUILTIN, HIGH);
+			delay(100);
+			digitalWrite(LED_BUILTIN, LOW);
+		}
+	}
+	
 	// 延时，避免占用过高 CPU（根据实时需求可调整或移除）
 	delay(1000);
 }
