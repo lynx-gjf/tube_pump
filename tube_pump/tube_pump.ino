@@ -55,6 +55,8 @@ void loop() {
 	int channel_num = (ch - '1'); // 将 '1','2','3' 转为 0,1,2
 
 	String pre_send = buf_serial.substring(3);
+	pre_send.trim(); // 去除前后空白
+	pre_send = pre_send + "\r\n";
 
 	Serial.println(String("ch: ") + ch);
 	Serial.println(String("idx: ") + channel_num);
@@ -62,11 +64,6 @@ void loop() {
 
 	// 将 Serial 输入转发到对应 TTL 通道（注意 tx/rx 参数顺序）
 	send_string_channel(rxPins[channel_num], txPins[channel_num], pre_send);
-	char* aa = "P1, Q1, 1\r\n";
-	send_string_channel(rxPins[2], txPins[2], aa);
-	delay(10000);
-	char* ab = "P1, Q1, 0\r\n";
-	send_string_channel(rxPins[2], txPins[2], ab);
 	delay(10000);
 
 	// 三个通道按顺序轮询
