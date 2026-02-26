@@ -1,9 +1,13 @@
+// 适配 Arduino Uno R3：强制使用 SoftwareSerial（将 USE_SERIAL1 设为 0）
+#define USE_SERIAL1 0
+#include <SoftwareSerial.h>
+#include <Arduino.h> // 包含 Arduino.h 以使用 String、millis() 等功能
 #include "ttl_comm.h"
 #include "ttl_send.h"
 #include "cmd_parser.h"
 
 /*
- Name:		pumps.ino
+ Name:		tube_pump.ino
  Created:	2026/1/12 17:12:28
  Author:	gwq
 */
@@ -25,7 +29,7 @@ constexpr int ttl_channel = 3;
 void setup() {
 	Serial.begin(9600); // 调试串口
 	for (int cf = 0; cf < ttl_channel; ++cf) {
-		configureTTL(rxPins[cf], txPins[cf], TTL_BAUD); // 初始化 TTL 通道，设置波特率
+		configureTTL(rxPins[cf], txPins[cf], TTL_BAUD); // 初始化 TTL 通道，设置波特率（使用 SoftwareSerial）
 	}
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, LOW);
