@@ -21,13 +21,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tube_pump.ino" />
-    <ClCompile Include="..\..\esp32c3\esp32c3\ttl_comm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\esp32c3\esp32c3\ttl_send.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cmd_parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttl_comm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ttl_send.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,13 +35,13 @@
     <ClInclude Include="__vm\.tube_pump.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\esp32c3\esp32c3\ttl_comm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\esp32c3\esp32c3\ttl_send.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="cmd_parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttl_comm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ttl_send.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
