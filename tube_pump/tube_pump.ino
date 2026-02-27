@@ -1,6 +1,4 @@
 #include "ttl_comm.h"
-#include "ttl_send.h"
-#include "cmd_parser.h"
 
 /*
  Name:		pumps.ino
@@ -23,9 +21,10 @@ constexpr size_t LOCAL_READ_BUF = 128;
 constexpr int ttl_channel = 3;
 
 void setup() {
-	Serial.begin(9600); // 调试串口
-	for (int cf = 0; cf < ttl_channel; ++cf) {
-		configureTTL(rxPins[cf], txPins[cf], TTL_BAUD);
+	Serial.begin(TTL_BAUD); // 调试串口
+	// 为 UNO R3 预先初始化第 0 通道（可选）
+	for (int i = 0; i < ttl_channel; ++i) {
+		configureTTL(rxPins[i], txPins[i], TTL_BAUD);
 	}
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, LOW);
@@ -34,33 +33,26 @@ void setup() {
 void loop() {
 	delay(1000);
 	// 从 Serial 读取输入到 String
-	String buf_serial = read_string_serial(perChannelTimeoutMs);
-
-	// 基本输入长度校验（需要至少包含索引 1 和后续数据）
-	/*if (buf_serial.length() < 3) {
-		Serial.println("Err: input too short");
-		delay(10);
-		return; // 或者 continue; 视上下文决定；在 Arduino loop 中使用 return 会结束本次 loop 执行
-	} */
+	String buf_serial = Serial.readString();
 
 	// 通道号在第二位（索引1），使用 char 解析并转换为 0 基索引
+	if (buf_serial.length() < 2) return; // 简单保护
 	char ch = buf_serial.charAt(1);
-	/*if (ch < '1' || ch > char('0' + ttl_channel)) {
-		Serial.println("Err: invalid channel");
-		delay(100);
-		return;
-	} */
 	int channel_num = (ch - '1'); // 将 '1','2','3' 转为 0,1,2
+	if (channel_num < 0 || channel_num >= ttl_channel) {
+		// invalid channel, 忽略
+		return;
+	}
 
 	String pre_send = buf_serial.substring(3);
 	pre_send.trim(); // 去除前后空白
 	pre_send = pre_send + "\r\n";
 	if (pre_send.length() > 5) {
-		send_string_channel(txPins[channel_num], rxPins[channel_num], pre_send);
+		sendToChannel(txPins[channel_num], rxPins[channel_num], pre_send);
 		digitalWrite(LED_BUILTIN, HIGH);
 		delay(100); // 短暂延时，确保发送完成
 		digitalWrite(LED_BUILTIN, LOW);
-		String got_ttl = read_string_channel(rxPins[channel_num], txPins[channel_num], 200);
+		String got_ttl = readFromChannel(txPins[channel_num], rxPins[channel_num], 200);
 		// 输出 TTL 响应到 Serial 监视器
 		if (got_ttl.length() > 0) {
 			Serial.println(got_ttl);
@@ -71,5 +63,5 @@ void loop() {
 	}
 
 	// 延时，避免占用过高 CPU（根据实时需求可调整或移除）
-	delay(1000);
+	delay(100);
 }

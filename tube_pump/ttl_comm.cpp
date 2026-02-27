@@ -1,8 +1,8 @@
 #include "ttl_comm.h"
-#include <Arduino.h> // 包含 Arduino.h 以使用 String、millis() 等功能
+#include <Arduino.h> // 使用 String、millis() 等功能
 
 #if defined(ARDUINO_ARCH_AVR)
-#include <SoftwareSerial.h> // 使用 SoftwareSerial（针对 Arduino Uno R3）
+#include <SoftwareSerial.h>
 #define USE_SOFTWARESERIAL 1
 #else
 #define USE_SOFTWARESERIAL 0
@@ -51,8 +51,13 @@ void configureTTL(uint8_t rxPin, uint8_t txPin, unsigned long baud) {
             channels[i].owns = true;
 #else
             // 在非 AVR 平台（例如 ESP32）回退到内置的 Serial
+#if defined(ARDUINO_ARCH_ESP32)
+            Serial2.begin(baud, SERIAL_8N1, rxPin, txPin);
+            channels[i].inst = &Serial2;
+#else
             Serial.begin(baud);
             channels[i].inst = &Serial;
+#endif
             channels[i].owns = false;
 #endif
             currentStream = channels[i].inst;
@@ -85,8 +90,13 @@ void configureTTL(uint8_t rxPin, uint8_t txPin, unsigned long baud) {
         channels[0].owns = true;
     }
 #else
+#if defined(ARDUINO_ARCH_ESP32)
+    Serial2.begin(baud, SERIAL_8N1, rxPin, txPin);
+    channels[0].inst = &Serial2;
+#else
     Serial.begin(baud);
     channels[0].inst = &Serial;
+#endif
     channels[0].owns = false;
 #endif
     currentStream = channels[0].inst;
@@ -109,7 +119,7 @@ void sendToChannel(uint8_t txPin, uint8_t rxPin, const String& data) {
     }
 }
 
-String readFromChannel(uint8_t rxPin, uint8_t txPin, unsigned long timeoutMs) {
+String readFromChannel(uint8_t txPin, uint8_t rxPin, unsigned long timeoutMs) {
     String result;
     configureTTL(rxPin, txPin, TTL_BAUD);
     if (!currentStream) return result;
@@ -145,7 +155,7 @@ void sendBytesToChannel(uint8_t txPin, uint8_t rxPin, const uint8_t* data, size_
     }
 }
 
-size_t readBytesFromChannel(uint8_t rxPin, uint8_t txPin, uint8_t* outBuffer, size_t maxLen, unsigned long timeoutMs) {
+size_t readBytesFromChannel(uint8_t txPin, uint8_t rxPin, uint8_t* outBuffer, size_t maxLen, unsigned long timeoutMs) {
     if (outBuffer == nullptr || maxLen == 0) return 0;
     configureTTL(rxPin, txPin, TTL_BAUD);
     if (!currentStream) return 0;
@@ -164,4 +174,27 @@ size_t readBytesFromChannel(uint8_t rxPin, uint8_t txPin, uint8_t* outBuffer, si
         delay(1);
     }
     return written;
+}
+
+bool setSerial2Pins(uint8_t rxPin, uint8_t txPin) {
+    // 对于 AVR（UNO R3），使用 SoftwareSerial，通过 configureTTL 即可
+#if USE_SOFTWARESERIAL
+    configureTTL(rxPin, txPin, TTL_BAUD);
+    return true;
+#elif defined(ARDUINO_ARCH_ESP32)
+    // 在 ESP32 上，HardwareSerial::begin 支持指定 rx/tx
+    Serial2.begin(TTL_BAUD, SERIAL_8N1, rxPin, txPin);
+    // 更新 channels 表
+    channels[0].inst = &Serial2;
+    channels[0].rx = rxPin;
+    channels[0].tx = txPin;
+    channels[0].baud = TTL_BAUD;
+    channels[0].owns = false;
+    currentStream = &Serial2;
+    return true;
+#else
+    // 其他平台未实现运行时映射
+    (void)rxPin; (void)txPin;
+    return false;
+#endif
 }

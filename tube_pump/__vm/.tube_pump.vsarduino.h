@@ -6,7 +6,7 @@
 			All non-arduino files created by visual micro and all visual studio project or solution files can be freely deleted and are not required to compile a sketch (do not delete your own code!).
 			Note: debugger breakpoints are stored in '.sln' or '.asln' files, knowledge of last uploaded breakpoints is stored in the upload.vmps.xml file. Both files are required to continue a previous debug session without needing to compile and upload again
 	
-	Hardware: Arduino UNO R4 WiFi(unor4wifi), Platform=renesas_uno, Package=arduino
+	Hardware: Arduino UNO(uno), Platform=avr, Package=arduino
 */
 
 #if defined(_VMICRO_INTELLISENSE)
@@ -16,10 +16,7 @@
 #pragma diag_suppress=338,2925
 // User Defined Errors to Ignore below... [vm.intellisense.ignore-error-codes]
 #include <arduino.h>
-#include <elc_defines.h> 
 #include <pins_arduino.h> 
-#include <tusb_config.h> 
-#include <variant.cpp> 
 #include "..\tube_pump.ino"
 #endif
 #endif
