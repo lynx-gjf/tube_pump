@@ -7,6 +7,9 @@
 
 /// 针对 Arduino R4 Uno：优先使用硬件串口 Serial1
 /// 若需要回退到 SoftwareSerial（多路软串口），将下面宏设为 0
+#ifndef USE_SERIAL1
+#define USE_SERIAL1 1
+#endif
 
 constexpr unsigned long TTL_BAUD = 9600;
 constexpr unsigned long RX_WAIT_MS = 100; // 默认读等待 ms

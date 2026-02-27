@@ -56,7 +56,8 @@ void configureTTL(unsigned long baud)  // 该函数现在仅按波特率配置 S
 
     // 如果已经是 Serial2 且波特率未变，则无需再次配置
     if (currentStream == &Serial2 && s_currentBaud == baud) {
-        return;
+            return;
+        }
     }
 
     // 在支持的平台上，若用户请求了特定引脚，则在 begin 时指定它们
@@ -77,6 +78,10 @@ void configureTTL(unsigned long baud)  // 该函数现在仅按波特率配置 S
     channels[0].rx = 0xFF;
     channels[0].tx = 0xFF;
 #endif
+            currentStream = channels[i].inst;
+            return;
+        }
+    }
 
     s_currentBaud = baud;
 
@@ -121,4 +126,41 @@ String readFromChannel(uint8_t txPin, uint8_t rxPin, unsigned long timeoutMs) {
     return result;
 }
 
+void sendBytesToChannel(uint8_t txPin, uint8_t rxPin, const uint8_t* data, size_t length) {
+    if (data == nullptr || length == 0) return;
+    configureTTL(rxPin, txPin, TTL_BAUD);
+    if (!currentStream) return;
+    // 使用 Print::write 的签名写入字节数组
+    currentStream->write(data, length);
+    for (size_t i = 0; i < (sizeof(channels)/sizeof(channels[0])); ++i) {
+        if (channels[i].inst && channels[i].inst == currentStream) {
+#if USE_SOFTWARESERIAL
+            static_cast<SoftwareSerial*>(channels[i].inst)->flush();
+#else
+            channels[i].inst->flush();
+#endif
+            break;
+        }
+    }
+}
 
+size_t readBytesFromChannel(uint8_t rxPin, uint8_t txPin, uint8_t* outBuffer, size_t maxLen, unsigned long timeoutMs) {
+    if (outBuffer == nullptr || maxLen == 0) return 0;
+    configureTTL(rxPin, txPin, TTL_BAUD);
+    if (!currentStream) return 0;
+
+    size_t written = 0;
+    unsigned long start = millis();
+    while (millis() - start < timeoutMs) {
+        while (currentStream->available()) {
+            int c = currentStream->read();
+            if (c < 0) continue;
+            if (written < maxLen) {
+                outBuffer[written++] = (uint8_t)c;
+            }
+        }
+        yield();
+        delay(1);
+    }
+    return written;
+}

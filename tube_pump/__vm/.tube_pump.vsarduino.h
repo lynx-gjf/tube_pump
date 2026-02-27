@@ -16,7 +16,10 @@
 #pragma diag_suppress=338,2925
 // User Defined Errors to Ignore below... [vm.intellisense.ignore-error-codes]
 #include <arduino.h>
+#include <elc_defines.h> 
 #include <pins_arduino.h> 
+#include <tusb_config.h> 
+#include <variant.cpp> 
 #include "..\tube_pump.ino"
 #endif
 #endif
