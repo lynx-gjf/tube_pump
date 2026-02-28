@@ -16,8 +16,8 @@
 
 // 三个 TTL 通道的引脚映射（索引一一对应）
 // 第 n 个通道使用 txPins[n] / rxPins[n]
-const uint8_t rxPins[3] = { 2, 3, 10 };
-const uint8_t txPins[3] = { 6, 7, 11 };
+const uint8_t rxPins[3] = { 2, 3, 18 };
+const uint8_t txPins[3] = { 6, 7, 19 };
 
 // 支持的通道数（命令里对应 #1 / #2 / #3）
 constexpr int ttl_channel = 3;
