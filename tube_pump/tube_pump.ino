@@ -10,14 +10,13 @@
  Author:    gwq
 */
 
-// 串口通信状态指示灯：发送/接收分别闪烁
-#define LED_BUILTIN1 12
-#define LED_BUILTIN2 13
+// LEDPin 97
+
 
 // 三个 TTL 通道的引脚映射（索引一一对应）
 // 第 n 个通道使用 txPins[n] / rxPins[n]
-const uint8_t rxPins[3] = { 2, 3, 18 };
-const uint8_t txPins[3] = { 6, 7, 19 };
+const uint8_t rxPins[3] = { 18, 17, 19 };
+const uint8_t txPins[3] = { 20, 46, 10 };
 
 // 支持的通道数（命令里对应 #1 / #2 / #3）
 constexpr int ttl_channel = 3;
@@ -93,9 +92,9 @@ static void taskSerialConsole(void* /*pv*/)
         if (xQueueReceive(g_rspQ, &rsp, pdMS_TO_TICKS(5)) == pdPASS) {
             if (rsp.hasData) {
                 Serial.printf("[CH%d] %s\n", rsp.channel + 1, rsp.payload);
-                digitalWrite(LED_BUILTIN2, HIGH);
+
                 vTaskDelay(pdMS_TO_TICKS(80));
-                digitalWrite(LED_BUILTIN2, LOW);
+
             } else {
                 Serial.printf("[CH%d] <no response>\n", rsp.channel + 1);
             }
@@ -124,9 +123,9 @@ static void taskSerial1Worker(void* /*pv*/)
             sendToChannel(tx, rx, txData);
 
             // 发送指示灯
-            digitalWrite(LED_BUILTIN1, HIGH);
+
             vTaskDelay(pdMS_TO_TICKS(50));
-            digitalWrite(LED_BUILTIN1, LOW);
+
 
             // 读取响应
             String got = readFromChannel(tx, rx, ttlReadTimeoutMs);
@@ -149,10 +148,11 @@ void setup()
 
     // 初始化指示灯
     pinMode(LED_BUILTIN, OUTPUT);
-    pinMode(LED_BUILTIN1, OUTPUT);
-    pinMode(LED_BUILTIN2, OUTPUT);
-    digitalWrite(LED_BUILTIN1, LOW);
-    digitalWrite(LED_BUILTIN2, LOW);
+	digitalWrite(LED_BUILTIN, HIGH);
+	delay(500);
+    digitalWrite(LED_BUILTIN, LOW);
+
+
 
     // 创建任务间通信队列
     g_reqQ = xQueueCreate(8, sizeof(TtlRequest));
